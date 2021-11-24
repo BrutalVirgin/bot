@@ -1,11 +1,10 @@
 import { Telegraf, Telegram } from "telegraf";
-// import { GroupsRepository } from "./repos/group-repo"
+import { InMemoryRepository } from "./repos/group-repo"
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 const api = new Telegram("")
-// const groupsRepo = new GroupsRepository()
-
-const group = {}
+import { TelegramBot } from "node-telegram-bot-api"
+const groupsRepo = new InMemoryRepository()
 
 bot.start((ctx) =>
     ctx.reply(
@@ -30,6 +29,24 @@ bot.command("whoami", (ctx) => {
 
 bot.command("users", (ctx) => {
     ctx.getChat().then(console.log)
+})
+
+const questions: string[] = [
+    "ti pidor?",
+    "ny da"
+]
+bot.command("poll", (ctx) => {
+    api.sendPoll(ctx.chat.id, "дарова", questions)
+})
+
+bot.command("getuser", (ctx) => {
+    const userId = ctx.from.id;
+
+    const socialCreditPromise = groupsRepo.getSocialCreditById(userId);
+
+    socialCreditPromise.then(num => {
+        ctx.reply(String(num))
+    })
 })
 
 // Обработчик простого текста
