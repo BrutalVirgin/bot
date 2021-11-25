@@ -2,8 +2,8 @@ import { Telegraf, Telegram } from "telegraf";
 import { InMemoryRepository } from "./repos/group-repo"
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
-const api = new Telegram("")
-import { TelegramBot } from "node-telegram-bot-api"
+const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
+
 const groupsRepo = new InMemoryRepository()
 
 bot.start((ctx) =>
@@ -35,8 +35,22 @@ const questions: string[] = [
     "ti pidor?",
     "ny da"
 ]
+
+bot.on("message", (ctx) => {
+    console.log(ctx.updateType)
+
+
+    // api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+})
+
+bot.on("photo", (ctx) => {
+    if (ctx.message.photo) {
+        console.log(3)
+    }
+})
+
 bot.command("poll", (ctx) => {
-    api.sendPoll(ctx.chat.id, "дарова", questions)
+    api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
 })
 
 bot.command("getuser", (ctx) => {
@@ -47,6 +61,14 @@ bot.command("getuser", (ctx) => {
     socialCreditPromise.then(num => {
         ctx.reply(String(num))
     })
+})
+
+bot.on("poll", () => {
+    console.log("1")
+})
+
+bot.on("poll_answer", () => {
+    console.log(2)
 })
 
 // Обработчик простого текста
