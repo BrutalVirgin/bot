@@ -6,6 +6,7 @@ const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 
 const groupsRepo = new InMemoryRepository()
 
+
 bot.start((ctx) =>
     ctx.reply(
         `Приветствую, ${ctx.from.id ? ctx.from.id : "хороший человек"
@@ -32,15 +33,24 @@ bot.command("users", (ctx) => {
 })
 
 const questions: string[] = [
-    "ti pidor?",
-    "ny da"
+    "ДА",
+    "НЕТ"
 ]
 
+let votes = 0
+
 bot.on("message", (ctx) => {
-    console.log(ctx.updateType)
-
-
+    if ("photo" in ctx.message) {
+        bot.telegram.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+    }
+    // else {
+    //     console.log("Something else")
+    // }
     // api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+})
+
+bot.on("text", () => {
+    console.log("text")
 })
 
 bot.on("photo", (ctx) => {
@@ -67,7 +77,12 @@ bot.on("poll", () => {
     console.log("1")
 })
 
-bot.on("poll_answer", () => {
+bot.on("poll_answer", (ctx) => {
+    if (ctx.pollAnswer.option_ids[0] === 0) {
+        votes -= 1
+    } else {
+        votes -= 1
+    }
     console.log(2)
 })
 
