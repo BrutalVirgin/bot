@@ -1,4 +1,5 @@
 import { Telegraf, Telegram } from "telegraf";
+import { text } from "telegraf/typings/button";
 import { InMemoryRepository } from "./repos/group-repo"
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
@@ -33,20 +34,43 @@ bot.command("users", (ctx) => {
 })
 
 const questions: string[] = [
-    "ДА",
-    "НЕТ"
+    "плюс 5 социального рейтинга",
+    "минус 5 социального рейтинга"
 ]
 
 let votes = 0
 
 bot.on("message", (ctx) => {
     if ("photo" in ctx.message) {
-        bot.telegram.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+        ctx.reply("Насколько смешной мем?", {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "плюс 5  社会评价",
+                            callback_data: "asdsdasd",
+                        },
+                        {
+                            text: "минус 5  社会评价",
+                            callback_data: "asda"
+                        },
+                    ]
+                ]
+            }
+        })
     }
+    // if ("photo" in ctx.message) {
+    //     bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false })
+    // }
     // else {
-    //     console.log("Something else")
+    //     ctx.reply("Something else")
     // }
     // api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+})
+
+bot.action("asdsdasd", (ctx) => {
+    ctx.answerCbQuery()
+    console.log("asdasdasd")
 })
 
 bot.on("text", () => {
