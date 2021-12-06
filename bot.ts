@@ -41,30 +41,30 @@ const questions: string[] = [
 let votes = 0
 
 bot.on("message", (ctx) => {
-    if ("photo" in ctx.message) {
-        ctx.reply("Насколько смешной мем?", {
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        {
-                            text: "плюс 5  社会评价",
-                            callback_data: "asdsdasd",
-                        },
-                        {
-                            text: "минус 5  社会评价",
-                            callback_data: "asda"
-                        },
-                    ]
-                ]
-            }
-        })
-    }
     // if ("photo" in ctx.message) {
-    //     bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false })
+    //     ctx.reply("Насколько смешной мем?", {
+    //         reply_markup: {
+    //             inline_keyboard: [
+    //                 [
+    //                     {
+    //                         text: "плюс 5  社会评价",
+    //                         callback_data: "asdsdasd",
+    //                     },
+    //                     {
+    //                         text: "минус 5  社会评价",
+    //                         callback_data: "asda"
+    //                     },
+    //                 ]
+    //             ]
+    //         }
+    //     })
     // }
-    // else {
-    //     ctx.reply("Something else")
-    // }
+    if ("photo" in ctx.message) {
+        bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false })
+    }
+    else {
+        ctx.reply("Something else")
+    }
     // api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
 })
 
