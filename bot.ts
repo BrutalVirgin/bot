@@ -34,39 +34,29 @@ bot.command("users", (ctx) => {
 })
 
 const questions: string[] = [
-    "плюс 5 социального рейтинга",
-    "минус 5 социального рейтинга"
+    "плюс 5  社会评价",
+    "минус 5  社会评价"
 ]
 
-let votes = 0
-
 bot.on("message", (ctx) => {
-    // if ("photo" in ctx.message) {
-    //     ctx.reply("Насколько смешной мем?", {
-    //         reply_markup: {
-    //             inline_keyboard: [
-    //                 [
-    //                     {
-    //                         text: "плюс 5  社会评价",
-    //                         callback_data: "asdsdasd",
-    //                     },
-    //                     {
-    //                         text: "минус 5  社会评价",
-    //                         callback_data: "asda"
-    //                     },
-    //                 ]
-    //             ]
-    //         }
-    //     })
-    // }
     if ("photo" in ctx.message) {
-        bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false })
+        bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
+        bot.on("poll", (ctx) => {
+            console.log(ctx.poll.id)
+        })
     }
-    else {
-        ctx.reply("Something else")
-    }
-    // api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
 })
+
+bot.on("poll_answer", (ctx) => {
+    if (ctx.pollAnswer.option_ids[0] === 0) {
+        votes -= 1
+    } else {
+        votes -= 1
+    }
+    console.log("answear")
+})
+
+let votes = 0
 
 bot.action("asdsdasd", (ctx) => {
     ctx.answerCbQuery()
@@ -101,14 +91,7 @@ bot.on("poll", () => {
     console.log("1")
 })
 
-bot.on("poll_answer", (ctx) => {
-    if (ctx.pollAnswer.option_ids[0] === 0) {
-        votes -= 1
-    } else {
-        votes -= 1
-    }
-    console.log(2)
-})
+
 
 // Обработчик простого текста
 bot.on("text", (ctx) => {
