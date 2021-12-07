@@ -1,12 +1,17 @@
+import { rejects } from "assert/strict";
+import e from "express";
+import { type } from "os";
+import { resolve } from "path/posix";
 import { Telegraf, Telegram } from "telegraf";
 import { text } from "telegraf/typings/button";
 import { InMemoryRepository } from "./repos/group-repo"
+import { PollRepo } from "./Poll/Poll-repo"
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 
 const groupsRepo = new InMemoryRepository()
-
+const pollRepo = new PollRepo()
 
 bot.start((ctx) =>
     ctx.reply(
@@ -38,11 +43,25 @@ const questions: string[] = [
     "минус 5  社会评价"
 ]
 
-bot.on("message", (ctx) => {
+const pollIds: string[] = []
+
+bot.on("message", async (ctx) => {
     if ("photo" in ctx.message) {
-        bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
-        bot.on("poll", (ctx) => {
-            console.log(ctx.poll.id)
+        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
+            .then(c => c.poll.id)
+
+        const poll = { pollId: pollId, votes: 0 }
+        pollRepo.insertPoll(poll)
+        const curPoll = pollRepo.findPoll(poll.pollId)
+
+        bot.on("poll_answer", (ctx) => {
+            if (curPoll) {
+                if (ctx.pollAnswer.option_ids[0] === 0) {
+                    votes -= 1
+                } else {
+                    votes -= 1
+                }
+            }
         })
     }
 })
