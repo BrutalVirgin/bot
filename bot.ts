@@ -35,7 +35,10 @@ bot.command("whoami", (ctx) => {
 });
 
 bot.command("users", (ctx) => {
-    ctx.getChat().then(console.log)
+    ctx.getChat().then(ctx.getChatMembersCount)
+})
+bot.command("message", (ctx) => {
+    ctx.getChat.
 })
 
 const questions: string[] = [
@@ -45,34 +48,32 @@ const questions: string[] = [
 
 const pollIds: string[] = []
 
+var counter = 0
+
 bot.on("message", async (ctx) => {
     if ("photo" in ctx.message) {
-        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
+        
+        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 100 })
             .then(c => c.poll.id)
 
-        const poll = { pollId: pollId, votes: 0 }
+        const poll = { pollId: pollId, userId: ctx.from.id, votes: 0 }
         pollRepo.insertPoll(poll)
-        const curPoll = pollRepo.findPoll(poll.pollId)
-
-        bot.on("poll_answer", (ctx) => {
-            if (curPoll) {
-                if (ctx.pollAnswer.option_ids[0] === 0) {
-                    votes -= 1
-                } else {
-                    votes -= 1
-                }
-            }
-        })
     }
 })
 
 bot.on("poll_answer", (ctx) => {
-    if (ctx.pollAnswer.option_ids[0] === 0) {
-        votes -= 1
-    } else {
-        votes -= 1
+    console.log("asdasdsadasdaskdjfkhbsjadlfdkhvjbkklhvkj")
+    const curPoll = pollRepo.findPoll(ctx.pollAnswer.poll_id)
+    if (curPoll) {
+        const updated = {
+            ...curPoll,
+            votes: ctx.pollAnswer.option_ids[0] === 0
+                ? curPoll.votes + 1
+                : curPoll.votes - 1
+        }
+
+        pollRepo.insertPoll(updated)
     }
-    console.log("answear")
 })
 
 let votes = 0
@@ -105,12 +106,6 @@ bot.command("getuser", (ctx) => {
         ctx.reply(String(num))
     })
 })
-
-bot.on("poll", () => {
-    console.log("1")
-})
-
-
 
 // Обработчик простого текста
 bot.on("text", (ctx) => {
