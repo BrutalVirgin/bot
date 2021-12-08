@@ -23,6 +23,10 @@ export class InMemoryRepository implements IUserRepository {
         }
         return socialCredit
     }
+
+    async pollTimer() {
+
+    }
 }
 
 

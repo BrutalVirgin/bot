@@ -37,27 +37,39 @@ bot.command("whoami", (ctx) => {
 bot.command("users", (ctx) => {
     ctx.getChat().then(ctx.getChatMembersCount)
 })
-bot.command("message", (ctx) => {
-    ctx.getChat.
-})
 
 const questions: string[] = [
     "плюс 5  社会评价",
     "минус 5  社会评价"
 ]
 
-const pollIds: string[] = []
-
-var counter = 0
-
 bot.on("message", async (ctx) => {
     if ("photo" in ctx.message) {
-        
-        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 100 })
+
+        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
             .then(c => c.poll.id)
 
         const poll = { pollId: pollId, userId: ctx.from.id, votes: 0 }
         pollRepo.insertPoll(poll)
+
+    }
+})
+
+bot.on("poll", async (ctx) => {
+    if (ctx.poll.is_closed) {
+        console.log("closed")
+        const curPoll = pollRepo.findPoll(ctx.poll.id)
+        const user = groupsRepo.getSocialCreditById(curPoll?.userId!)
+
+        if (curPoll?.votes! >= 1) {
+            groupsRepo.updateSocialCredit(await user, 5)
+        }
+        if (curPoll?.votes! <= -1) {
+            groupsRepo.updateSocialCredit(await user, -5)
+        } else {
+            groupsRepo.updateSocialCredit(await user, 0)
+        }
+        console.log(user)
     }
 })
 
