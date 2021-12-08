@@ -93,7 +93,7 @@ bot.on("photo", (ctx) => {
 })
 
 bot.command("poll", (ctx) => {
-    api.sendPoll(ctx.chat.id, "дарова", questions, { is_anonymous: false })
+    api.sendPoll(ctx.chat.id, "Привет", questions, { is_anonymous: false })
 })
 
 bot.command("getuser", (ctx) => {
