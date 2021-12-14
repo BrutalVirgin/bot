@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/BrutalVirgin/bot#readme",
   "dependencies": {
+    "moment": "^2.29.1",
     "node-telegram-bot-api": "^0.54.0",
     "telegraf": "^4.5.2"
   },

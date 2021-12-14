@@ -24,11 +24,9 @@ export class InMemoryRepository implements IUserRepository {
         return socialCredit
     }
 
-    async pollTimer() {
-
+    showUSer(userId: number) {
+        const socialCredit = this._usersCredit[userId]
+        return socialCredit
     }
+
 }
-
-
-
-
