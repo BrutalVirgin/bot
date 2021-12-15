@@ -24,12 +24,25 @@
             ],
         },
         {
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
             "name": "Start bot",
             "console": "integratedTerminal",
+            // "runtimeArgs": [
+            //     "start"
+            // ],
             "program": "${workspaceFolder}/bot.ts",
             "runtimeExecutable": "nodemon",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Node: Nodemon",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "start"
+            ],
+            "outputCapture": "std",
         },
     ]
 }
