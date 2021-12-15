@@ -56,6 +56,7 @@ bot.on("message", async (ctx) => {
 
         const finalDate = new Date().getTime() + 1000 * 10
         const poll = { pollId: pollId, userId: ctx.from.id, votes: 0, startDate: Date.now(), finalDate, chatId: ctx.chat.id }
+        groupsRepo.getSocialCreditById(poll.userId)
         pollRepo.insertPoll(poll)
         pollTracker.register(pollId, 5)
 
@@ -90,7 +91,8 @@ pollTracker.on("poll_ended", (pollId) => {
         }
         if (poll?.votes! <= -1) {
             groupsRepo.updateSocialCredit(user!, -5)
-        } else {
+        }
+        if (poll?.votes! === 0) {
             groupsRepo.updateSocialCredit(user!, 0)
         }
 
@@ -98,7 +100,7 @@ pollTracker.on("poll_ended", (pollId) => {
             sr => api.sendMessage(poll.chatId, `${user}: ${sr}`)
         )
 
-        
+
     }
 
 })
@@ -113,7 +115,7 @@ bot.on("poll_answer", (ctx) => {
                 : curPoll.votes - 1
         }
 
-        pollRepo.insertPoll(updated)
+        pollRepo.updatePoll(updated)
     }
 })
 
