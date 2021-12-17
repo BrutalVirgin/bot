@@ -35,6 +35,10 @@ export class PollTracker extends EventEmitter {
         return this._tracker[pollId] = +endsAt
     }
 
+    setName(name: string) {
+        return name
+    }
+
     async checkTimer() {
         for (const [id, time] of Object.entries(this._tracker)) {
             const now = moment()

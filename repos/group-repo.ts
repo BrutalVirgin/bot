@@ -24,8 +24,8 @@ export class InMemoryRepository implements IUserRepository {
         return socialCredit
     }
 
-    showUSer(userId: number) {
-        const socialCredit = this._usersCredit[userId]
+    showUSer(userId: string) {
+        const socialCredit = `${userId}:${this._usersCredit[userId]}`
         return socialCredit
     }
 

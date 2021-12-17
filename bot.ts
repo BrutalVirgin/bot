@@ -7,13 +7,14 @@ import { text } from "telegraf/typings/button";
 import { InMemoryRepository } from "./repos/group-repo"
 import { PollRepo } from "./Poll/Poll-repo"
 import { PollTracker } from "./Poll/Poll-tracker";
+import moment from "moment";
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 
 const groupsRepo = new InMemoryRepository()
 const pollRepo = new PollRepo()
-const pollTracker = new PollTracker(5)
+const pollTracker = new PollTracker(1)
 
 bot.start((ctx) =>
     ctx.reply(
@@ -51,58 +52,16 @@ const questions: string[] = [
 bot.on("message", async (ctx) => {
     if ("photo" in ctx.message) {
 
-        const pollId = await bot.telegram.sendPoll(ctx.chat.id, "оцени мем", questions, { is_anonymous: false, open_period: 10 })
+        const pollId = await bot.telegram.sendPoll(ctx.chat.id, pollTracker.setName("оцени мем"), questions, { is_anonymous: false, open_period: 10 })
             .then(c => c.poll.id)
 
-        const finalDate = new Date().getTime() + 1000 * 10
-        const poll = { pollId: pollId, userId: ctx.from.id, votes: 0, startDate: Date.now(), finalDate, chatId: ctx.chat.id }
+        //  const finalDate = new Date().getTime() + 1000 * 10
+        const finalDate = +moment().add(11, "seconds")
+        const poll = { pollId: pollId, userId: ctx.from.id, votes: 0, startDate: +moment(), finalDate, chatId: ctx.chat.id }
         groupsRepo.getSocialCreditById(poll.userId)
         pollRepo.insertPoll(poll)
-        pollTracker.register(pollId, 5)
-
+        pollTracker.register(pollId, 10)
     }
-})
-
-// bot.on("poll", async (ctx) => {
-//     if (ctx.poll.is_closed = true) {
-//         console.log("closed")
-//         const curPoll = pollRepo.findPoll(ctx.poll.id)
-//         const user = groupsRepo.getSocialCreditById(curPoll?.userId!)
-
-//         if (curPoll?.votes! >= 1) {
-//             groupsRepo.updateSocialCredit(await user, 5)
-//         }
-//         if (curPoll?.votes! <= -1) {
-//             groupsRepo.updateSocialCredit(await user, -5)
-//         } else {
-//             groupsRepo.updateSocialCredit(await user, 0)
-//         }
-//         console.log(user)
-//     }
-// })
-
-pollTracker.on("poll_ended", (pollId) => {
-    const poll = pollRepo.findPoll(pollId)
-    if (poll) {
-        const user = poll.userId
-
-        if (poll?.votes! >= 1) {
-            groupsRepo.updateSocialCredit(user!, 5)
-        }
-        if (poll?.votes! <= -1) {
-            groupsRepo.updateSocialCredit(user!, -5)
-        }
-        if (poll?.votes! === 0) {
-            groupsRepo.updateSocialCredit(user!, 0)
-        }
-
-        groupsRepo.getSocialCreditById(user).then(
-            sr => api.sendMessage(poll.chatId, `${user}: ${sr}`)
-        )
-
-
-    }
-
 })
 
 bot.on("poll_answer", (ctx) => {
@@ -119,7 +78,32 @@ bot.on("poll_answer", (ctx) => {
     }
 })
 
-let votes = 0
+pollTracker.on("poll_ended", (pollId) => {
+    const poll = pollRepo.findPoll(pollId)
+    if (poll) {
+        const user = poll.userId
+
+        if (poll?.votes! >= 1) {
+            groupsRepo.updateSocialCredit(user!, 5)
+        }
+        if (poll?.votes! <= -1) {
+            groupsRepo.updateSocialCredit(user!, -5)
+        }
+        if (poll?.votes! === 0) {
+            groupsRepo.updateSocialCredit(user!, 0)
+        }
+
+        const findUSer = groupsRepo.getSocialCreditById(user).then(
+            sr => (`${user}: ${sr}`)
+        )
+
+        pollTracker.setName(String(user))
+
+        groupsRepo.getSocialCreditById(user).then(
+            sr => api.sendMessage(poll.chatId, `${user}: ${sr}`)
+        )
+    }
+})
 
 bot.action("asdsdasd", (ctx) => {
     ctx.answerCbQuery()
