@@ -1,13 +1,10 @@
-import { rejects } from "assert/strict";
-import e from "express";
-import { type } from "os";
-import { resolve } from "path/posix";
 import { Telegraf, Telegram } from "telegraf";
-import { text } from "telegraf/typings/button";
 import { InMemoryRepository } from "./repos/group-repo"
 import { PollRepo } from "./Poll/Poll-repo"
 import { PollTracker } from "./Poll/Poll-tracker";
 import moment from "moment";
+import sequelize from "sequelize"
+import sqlite from "sqlite3"
 
 const bot = new Telegraf("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
@@ -15,6 +12,18 @@ const api = new Telegram("2115931653:AAHDDjLXvDb7bYKkzu-qfMZid8wVYKF9R_k")
 const groupsRepo = new InMemoryRepository()
 const pollRepo = new PollRepo()
 const pollTracker = new PollTracker(1)
+
+const db = new sqlite.Database('./data.db', sqlite.OPEN_READWRITE, (err) => {
+    if (err) return console.error(err)
+
+    console.log("connection is ok")
+})
+
+// const sql = `INSERT INTO users(first_name,last_name)
+//             VALUES(?,?)`
+const sql = 'DROP TABLE users'
+
+db.run(sql)
 
 bot.start((ctx) =>
     ctx.reply(
@@ -52,12 +61,29 @@ const questions: string[] = [
 bot.on("message", async (ctx) => {
     if ("photo" in ctx.message) {
 
-        const pollId = await bot.telegram.sendPoll(ctx.chat.id, pollTracker.setName("оцени мем"), questions, { is_anonymous: false, open_period: 10 })
-            .then(c => c.poll.id)
+        const result = await bot.telegram.sendPoll(ctx.chat.id,
+            pollTracker.setName("оцени мем"),
+            questions,
+            {
+                is_anonymous: false,
+                open_period: 10,
+                reply_to_message_id: ctx.message.message_id,
+            }
+        )
+        const pollId = result.poll.id
 
         //  const finalDate = new Date().getTime() + 1000 * 10
         const finalDate = +moment().add(11, "seconds")
-        const poll = { pollId: pollId, userId: ctx.from.id, votes: 0, startDate: +moment(), finalDate, chatId: ctx.chat.id }
+        const poll = {
+            pollId: pollId,
+            userId: ctx.from.id,
+            votes: 0,
+            startDate: +moment(),
+            finalDate,
+            chatId: ctx.chat.id,
+            username: ctx.from.username!,
+            chatMessageId: result.message_id
+        }
         groupsRepo.getSocialCreditById(poll.userId)
         pollRepo.insertPoll(poll)
         pollTracker.register(pollId, 10)
@@ -93,14 +119,12 @@ pollTracker.on("poll_ended", (pollId) => {
             groupsRepo.updateSocialCredit(user!, 0)
         }
 
-        const findUSer = groupsRepo.getSocialCreditById(user).then(
-            sr => (`${user}: ${sr}`)
-        )
-
         pollTracker.setName(String(user))
 
         groupsRepo.getSocialCreditById(user).then(
-            sr => api.sendMessage(poll.chatId, `${user}: ${sr}`)
+            sr => api.sendMessage(poll.chatId, `${poll.username}: ${sr}`, {
+                reply_to_message_id: poll.chatMessageId
+            })
         )
     }
 })

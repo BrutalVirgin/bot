@@ -36,6 +36,9 @@ export class PollTracker extends EventEmitter {
     }
 
     setName(name: string) {
+        setTimeout(() => {
+            return name = "dsfsdf"
+        }, 1000);
         return name
     }
 

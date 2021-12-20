@@ -4,5 +4,7 @@ export interface Poll {
     votes: number,
     startDate: number,
     finalDate: number,
-    chatId: number
+    chatId: number,
+    username: string,
+    chatMessageId: number
 }
