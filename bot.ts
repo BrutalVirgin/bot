@@ -84,6 +84,7 @@ bot.on("message", async (ctx) => {
             chatId: ctx.chat.id,
             username: ctx.from.username!,
             chatMessageId: result.message_id
+            // update
         }
         groupsRepo.getSocialCreditById(poll.userId)
         pollRepo.insertPoll(poll)
