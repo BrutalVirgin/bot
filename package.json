@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/BrutalVirgin/bot#readme",
   "dependencies": {
+    "knex": "^0.95.14",
     "moment": "^2.29.1",
     "node-telegram-bot-api": "^0.54.0",
     "sequelize": "^6.12.0",
