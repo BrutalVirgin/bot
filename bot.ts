@@ -18,6 +18,7 @@ const db = new sqlite.Database('./data.db', sqlite.OPEN_READWRITE, (err) => {
 
     console.log("connection is ok")
 })
+module.exports = db
 
 // const sql = `INSERT INTO users(first_name,last_name)
 //             VALUES(?,?)`

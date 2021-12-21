@@ -1,4 +1,8 @@
+import sqlite from "sqlite3"
+
 type UserId = number
+const db = require("../bot")
+
 
 export interface IUserRepository {
     getSocialCreditById(userId: UserId): Promise<number>
@@ -27,6 +31,24 @@ export class InMemoryRepository implements IUserRepository {
     showUSer(userId: string) {
         const socialCredit = `${userId}:${this._usersCredit[userId]}`
         return socialCredit
+    }
+
+}
+
+export class SqliteReposotory implements IUserRepository {
+    private readonly _client: sqlite.Database
+
+    constructor(private readonly filename: string) {
+        this._client = new sqlite.Database(filename)
+    }
+    getSocialCreditById(userId: number): Promise<number> {
+        this._client.run()
+        db.run(
+            `CREATE TABLE IF NOT EXISTS user_credit(user_id, social_credit)`
+        )
+    }
+    updateSocialCredit(userId: number, amount: number): Promise<number> {
+        throw new Error("Method not implemented.")
     }
 
 }
