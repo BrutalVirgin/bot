@@ -50,20 +50,20 @@ export class InMemoryRepository implements IUserRepository {
 
 }
 
-export class SqliteReposotory implements IUserRepository {
-    private readonly _client: sqlite.Database
+// export class SqliteReposotory implements IUserRepository {
+//     private readonly _client: sqlite.Database
 
-    constructor(private readonly filename: string) {
-        this._client = new sqlite.Database(filename)
-    }
-    getSocialCreditById(userId: number): Promise<number> {
-        // this._client.run()
-        // db.run(
-        //     `CREATE TABLE IF NOT EXISTS user_credit(user_id, social_credit)`
-        // )
-    }
-    updateSocialCredit(userId: number, amount: number): Promise<number> {
-        throw new Error("Method not implemented.")
-    }
+//     constructor(private readonly filename: string) {
+//         this._client = new sqlite.Database(filename)
+//     }
+//     getSocialCreditById(userId: number): Promise<number> {
+//         // this._client.run()
+//         // db.run(
+//         //     `CREATE TABLE IF NOT EXISTS user_credit(user_id, social_credit)`
+//         // )
+//     }
+//     updateSocialCredit(userId: number, amount: number): Promise<number> {
+//         throw new Error("Method not implemented.")
+//     }
 
-}
+// }
